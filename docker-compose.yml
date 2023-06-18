@@ -1,0 +1,73 @@
+version: '3'
+services:
+  squid:
+    build:
+      context: docker
+      dockerfile: ./Dockerfile
+    ports:
+      - "3128:3128" # http
+      - "3129:3129" # https
+#      - "10000:10000"
+    volumes:
+      - ./squid/data:/var/spool/squid
+      - ./squid/config/squid.conf:/etc/squid/squid.conf
+      - ./squid/logs:/var/log/squid
+      - ./squid/certs:/usr/local/squid
+#      - ./squid/config/snippet.conf:/etc/squid/conf.d/snippet.conf
+    depends_on:
+      - mysql_db
+    restart: always
+    networks:
+      - squid-network
+
+  mysql_db:
+    image: mysql:5.7.9
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: squid
+      MYSQL_USER: user
+      MYSQL_PASSWORD: UPP7#CWN@sDe
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    networks:
+      - squid-network
+
+  #Nginx Service
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/hosts:/etc/nginx/conf.d
+      - ./www:/var/www
+      - ./nginx/logs:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+    networks:
+      - squid-network
+
+  php:
+    build:
+      context: docker
+      dockerfile: ./php.Dockerfile
+    depends_on:
+      - mysql_db
+    volumes:
+      - ./www:/var/www
+    environment:
+      SERVER_NAME_PREFIX: John
+      SERVER_SQUID_HOST: localhost
+      SERVER_SQUID_PORT_HTTP: 3128
+      SERVER_SQUID_PORT_HTTPS: 3129
+      SERVER_API_KEY: bi0M7tBGob2bG6Q6qD9KmPTmFTdbLpkvxgBu77aCdoylbuJLATTxYyRSZw4h5IZih1FEYgFnLBJ9CyBeIPKGu0fAgnF6AYj38ntz4r6uD2E7KiURFvOienKcVlsFDKXr
+    networks:
+      - squid-network
+
+#Docker Networks
+networks:
+  squid-network:
+    driver: bridge
