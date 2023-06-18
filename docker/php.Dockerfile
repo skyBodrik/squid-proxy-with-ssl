@@ -34,14 +34,15 @@ RUN set -eux; \
             libwebp-dev \
             libxpm-dev \
             libmcrypt-dev \
-            libonig-dev; \
+            libonig-dev \
+            libzip-dev \
+            libxml2-dev; \
     rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
+    docker-php-ext-install dom xml zip; \
     # Install the PHP pdo_mysql extention
     docker-php-ext-install pdo_mysql; \
-    # Install the PHP pdo_pgsql extention
-    docker-php-ext-install pdo_pgsql; \
     # Install the PHP gd library
     docker-php-ext-configure gd \
             --prefix=/usr \
@@ -51,6 +52,11 @@ RUN set -eux; \
             --with-freetype; \
     docker-php-ext-install gd; \
     php -r 'var_dump(gd_info());'
+
+RUN apt-get update && \
+    apt-get install -y git zip unzip
+
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 # Указываем рабочую директорию для PHP
 WORKDIR /var/www

@@ -60,7 +60,7 @@ services:
       - ./www:/var/www
     environment:
       SERVER_NAME_PREFIX: John
-      SERVER_SQUID_HOST: localhost
+      SERVER_SQUID_HOST: 77.246.98.78
       SERVER_SQUID_PORT_HTTP: 3128
       SERVER_SQUID_PORT_HTTPS: 3129
       SERVER_API_KEY: bi0M7tBGob2bG6Q6qD9KmPTmFTdbLpkvxgBu77aCdoylbuJLATTxYyRSZw4h5IZih1FEYgFnLBJ9CyBeIPKGu0fAgnF6AYj38ntz4r6uD2E7KiURFvOienKcVlsFDKXr
